@@ -1,0 +1,303 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+  
+  body {
+    background: #f5f7fb;
+    color: #0f172a;
+    height: 100vh;
+  }
+  
+  /* Layout */
+  .layout {
+    display: flex;
+    height: 100vh;
+  }
+  
+  .sidebar {
+    width: 240px;
+    background: #0b1f3a;
+    color: white;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .sidebar-header {
+    padding: 20px;
+    font-size: 18px;
+    font-weight: 600;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  
+  nav {
+    display: flex;
+    flex-direction: column;
+    padding: 8px 0;
+  }
+  
+  .nav-item {
+    padding: 12px 20px;
+    cursor: pointer;
+    color: rgba(255,255,255,0.85);
+  }
+  
+  .nav-item:hover {
+    background: rgba(255,255,255,0.12);
+    color: #fff;
+  }
+  
+  .sidebar-footer {
+    margin-top: auto;
+    padding: 16px 20px;
+    font-size: 13px;
+    color: rgba(255,255,255,0.6);
+    border-top: 1px solid rgba(255,255,255,0.1);
+  }
+  
+  main {
+    flex: 1;
+    padding: 24px;
+    overflow-y: auto;
+  }
+  
+  /* Cards */
+  .card {
+    background: white;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 8px 24px rgba(15,23,42,0.06);
+    margin-bottom: 16px;
+  }
+  
+  .overview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  
+  .kpi-card {
+    background: white;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 6px 18px rgba(15,23,42,0.08);
+  }
+  
+  .kpi-label {
+    font-size: 12px;
+    color: #64748b;
+  }
+  
+  .kpi-value {
+    font-size: 22px;
+    font-weight: 600;
+    margin-top: 4px;
+  }
+  
+  /* Tables */
+  .table-wrap {
+    overflow-x: auto;
+  }
+  
+  .jobs-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .jobs-table th,
+  .jobs-table td {
+    padding: 10px;
+    border-bottom: 1px solid #e5e7eb;
+    text-align: left;
+  }
+  
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  
+  .primary {
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  
+  .primary:hover {
+    background: #1d4ed8;
+  }
+  
+  /* Modal */
+  .modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  
+  .hidden {
+    display: none;
+  }
+  
+  #modal-box {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 480px;
+  }
+  
+  /* Calendar */
+  .calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  
+  .calendar-header button {
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid #cbd5f5;
+    background: white;
+    cursor: pointer;
+  }
+  
+  .calendar-title {
+    font-size: 18px;
+    font-weight: 600;
+  }
+  
+  /* Month View */
+  .month-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-auto-rows: 120px;
+    gap: 1px;
+    background: #e5e7eb;
+  }
+  
+  .month-cell {
+    background: white;
+    padding: 6px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .month-date {
+    font-size: 12px;
+    color: #64748b;
+    margin-bottom: 4px;
+  }
+  
+  .month-job {
+    font-size: 11px;
+    padding: 2px 4px;
+    background: #dbeafe;
+    border-radius: 4px;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  /* Week View */
+  .week-wrapper {
+    display: grid;
+    grid-template-columns: 60px repeat(7, 1fr);
+    height: 800px;
+    border: 1px solid #e5e7eb;
+  }
+  
+  .time-col {
+    border-right: 1px solid #e5e7eb;
+  }
+  
+  .time-slot {
+    height: 60px;
+    font-size: 11px;
+    color: #64748b;
+    padding: 2px 4px;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  
+  .week-day-col {
+    position: relative;
+    border-right: 1px solid #e5e7eb;
+  }
+  
+  .week-day-header {
+    text-align: center;
+    font-size: 12px;
+    padding: 4px;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  
+  .week-day-body {
+    position: relative;
+    height: 960px;
+  }
+  
+  .week-job-block {
+    position: absolute;
+    left: 4px;
+    right: 4px;
+    background: #93c5fd;
+    border-radius: 6px;
+    padding: 4px;
+    font-size: 11px;
+  }
+  .weekly-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    height: 160px;
+    padding: 12px 4px 4px;
+    border-top: 1px solid #e5e7eb;
+  }
+  
+  .week-bar {
+    flex: 1;
+    background: linear-gradient(180deg, #3b82f6, #1e40af);
+    border-radius: 6px 6px 2px 2px;
+    min-height: 6px;
+    transition: height 0.3s ease;
+  }
+.week-bar {
+  position: relative;
+  cursor: pointer;
+}
+
+.week-bar::after {
+  content: attr(title);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 6px;
+  background: #111827;
+  color: white;
+  font-size: 11px;
+  padding: 4px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.week-bar:hover::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(-4px);
+}
+    
