@@ -18,23 +18,27 @@ async function renderLoading() {
 }
 async function renderLoggedOut() {
     app.innerHTML = `
-    <div class='is-flex is-justify-content-center is-align-items-center is-full-height'>
-    <div class='box' style='width: 360px;'>
-    <div id='top-text'>
-    <h2 class='is-size-4 has-text-light has-text-weight-bold'>Login</h2>
-    <p class='is-size-6 has-text-light'>Manage your business operations in one place</p>
+    <div class='d-flex justify-content-center align-items-center' style="min-height: 100vh;">
+    <div class='card shadow-lg' style="width: 400px;">
+    <div class='card-body p-4'>
+    <div class='text-center mb-4' id='login-wrapper'>
+    <h2 class='card-title fw-bold'>Login</h2>
+    <p class='text-muted'>Manage your business operations in one place</p>
     </div>
-    <div class='pt-2' id='email-wrapper'>
-    <input class='input is-normal'id="email" type="email" placeholder="Email" />
+    <div class='mb-3' id='email-wrapper'>
+    <label class='form-label'>Email</label>
+    <input class='form-control' id="email" type="email" placeholder="your@email.com" />
     </div>
-    <div class='py-2' id='password-wrapper'>
-    <input class='input is-normal' id="password" type="password" placeholder="Password" />
+    <div class='mb-3' id='password-wrapper'>
+    <label class='form-label'>Password</label>
+    <input class='form-control' id="password" type="password" placeholder="Enter password" />
     </div>
-    <div class='pb-2' id='login-button-wrapper'>
-    <button class='button is-primary is-full-width' id="login">Log In</button>
+    <div class='' id='login-button-wrapper'>
+    <button class='btn btn-primary w-100 mb-3' id="login">Log In</button>
     </div>
-    <p class='is-size-7 has-text-white' id='signup'>No Account? Create one here.</p>
+    <p class='text-center small' id='signup'>No Account? Create one here.</p>
     <p id="error" style="color:red;"></p>
+    </div>
     </div>
     </div>
     
@@ -47,23 +51,31 @@ async function renderLoggedOut() {
 async function renderLoggedIn(user) {
     app.innerHTML = `
 
-    <div class='columns is-gapless is-fullheight'>
-    <aside id='sidebar' class="column is-2 has-background-dark is-full-height">
-    <div class='menu p-4'>
-    <div class='is-size-4 has-text-light has-text-weight-bold'>Biltmore Forest Detailing</div>
-
-    <nav>
-    <div id='overview' class='is-size-4 has-text-light has-text-weight-medium pt-3'>Overview</div>
-    <div id='jobs' class='is-size-4 has-text-light has-text-weight-medium pt-3'>Jobs</div>
-    <div id='calendar' class='is-size-4 has-text-light has-text-weight-medium pt-3'>Calendar</div>
-    <div id='expenses' class='is-size-4 has-text-light has-text-weight-medium pt-3'>Expenses</div>
-    <div id='settings' class='is-size-4 has-text-light has-text-weight-medium pt-3'>Settings</div>
+    <div class='row'>
+    <aside id='sidebar' class="d-flex flex-column justify-content-between position-sticky top-0 col-2 bg-dark text-white vh-100">
+    <div>
+    <div class='py-3'>
+    <div class='border-bottom border-secondary'>
+    <h5 class='fw-bold mb-2'>Biltmore Forest Detailing</h5>
+    </div>
+    <nav class='pt-4'>
+    <div id='overview' class='nav-link text-white px-3 py-2 rounded mb-1 fs-5'>Overview</div>
+    <div id='jobs' class='nav-link text-white px-3 py-2 rounded mb-1 fs-5''>Jobs</div>
+    <div id='calendar' class='nav-link text-white px-3 py-2 rounded mb-1 fs-5''>Calendar</div>
+    <div id='expenses' class='nav-link text-white px-3 py-2 rounded mb-1 fs-5''>Expenses</div>
+    <div id='settings' class='nav-link text-white px-3 py-2 rounded mb-1 fs-5''>Settings</div>
     </nav>
+    </div>
+    </div>
     
-    <div class='is-size-4 has-text-light has-text-weight-bold'>Lochlan MacQueen</div>
+    <div class=' d-flex align-items-center border-top border-secondary'>
+    <div class=' d-flex align-items-center justify-content-center rounded-circle bg-primary' style='width: 36px; height: 36px;'>
+    <span class='text-white fw-bold'>LM</span>
+    </div>
+    <p class='mt-auto mb-auto fw-medium small fs-6'>Lochlan MacQueen</p>
     </div>
     </aside>
-    <main id='main' class='column'>
+    <main id='main' class='col p-4'>
 
 
     </main>
@@ -82,36 +94,38 @@ async function renderOverview () {
 const main = document.getElementById('main')
 
 main.innerHTML = `
-    <div id='overview-top-card' class='container is-flex is-justify-content-space-evenly pt-5 pb-6'>
+    <div id='overview-top-card' class='row pb-4 g-4'>
 
-    <div class =''>
-    <div class='card py-4 has-text-centered' style='width: 250px; height: 150px;'>
-    <h2 class='is-size-3 has-text-light has-text-weight-bold'>$902</h2>
-    <p>Revenue this month</p>
-    </div>
-    </div>
-
-    <div class =''>
-    <div class='card py-4 has-text-centered'style='width: 250px; height: 150px'>
-    <h2 class='is-size-3 has-text-light has-text-weight-bold'>$404</h2>
-    <p>Profit this month</p>
+    <div class ='col-4 card border-0' stlye='height: 140px;'>
+    <div class='card-body shadow-sm rounded p-3 d-flex justify-content-center align-items-center flex-column'>
+    <h2 class='fw-bold mb-1'>$902</h2>
+    <p class='text-muted text-uppercase small mb-0'>Revenue this month</p>
     </div>
     </div>
 
-    <div class = ''>
-    <div class='card py-4 has-text-centered' style='width: 250px; height: 150px;'>
-    <h2 class='is-size-3 has-text-light has-text-weight-bold'>12</h2>
-    <p>Jobs this week</p>
+    <div class ='col-4 card border-0'>
+    <div class='card-body shadow-sm rounded p-3 d-flex justify-content-center align-items-center flex-column'>
+    <h2 class='fw-bold'>$404</h2>
+    <p class='text-muted text-muted text-uppercase small mb-0'>Profit this month</p>
+    </div>
+    </div>
+
+    <div class = 'col-4 card border-0'>
+    <div class='card-body shadow-sm rounded p-3 d-flex justify-content-center align-items-center flex-column'>
+    <h2 class='fw-bold'>12</h2>
+    <p class='text-muted text-muted text-uppercase small mb-0'>Jobs this week</p>
     </div>
     </div>
 
     </div>
-    <div id='overview-middle-card' class='box' style='height: 250px;'>
-    <h2>Next Job</h2>
-    <p>Client Name, Date + Time, Address, Price, View Job, Mark Complete Button</p>
+    <div id='overview-middle-card' class='card shadow-sm border-0 mb-4' style='height: 250px;'>
+    <div class='card-body'>
+    <h4 class='card-title fw-bold'>Upcoming Job</h4>
+    
+    </div>
     </div>
 
-    <div id='overview-bottom-card' class='box' style='height: 350px;'>
+    <div id='overview-bottom-card' class='' style='height: 350px;'>
     <H2>Performance Graph</h2>
     <p>Month Graph analyzing profit week to week</p>
     </div>
@@ -135,12 +149,12 @@ const { data, error } = await supabase
   
     main.innerHTML = `
     <header>
-    <h2 class='title'>Jobs</h2>
+    <h2 class=''>Jobs</h2>
     </header>
     <div id='jobs-table-card'>
-    <table class='table is-hoverable'>
-    <tr class='tr'>
-    <th class='th'>Client Name</th>
+    <table class=''>
+    <tr class=''>
+    <th class=''>Client Name</th>
     <th>Service</th>
     <th>Date</th>
     <th>Phone</th>
@@ -153,7 +167,7 @@ const { data, error } = await supabase
     <tbody id="jobs-tbody"></tbody>
     </table>
     </div>
-    <button id='add-job-btn' class='button is-primary'>Add Job</button>
+    <button id='add-job-btn' class=''>Add Job</button>
     `
     document.getElementById('add-job-btn').onclick = getJobForm;
     // Row creation
@@ -171,8 +185,8 @@ const { data, error } = await supabase
         <td>${row.start_time}</td>
         <td>${row.status}</td>
         <td>
-        <button class='button'>✖</button>
-        <button class='button'>✓</button>
+        <button class=''>✖</button>
+        <button class=''>✓</button>
         </td>
         `;
         tbody.appendChild(tr);
@@ -324,14 +338,14 @@ async function renderExpenses () {
         .range(0,24)
     const main = document.getElementById('main')
     main.innerHTML = `
-    <h1 class='title'>Expenses</h1>
+    <h1 class=''>Expenses</h1>
     <div id='expenses-table-wrapper'>
-    <table class='table is-hoverable'>
+    <table class=''>
     <tr>
-    <th class='th'>Date</th>
-    <th class='th'>Type</th>
-    <th class='th'>Amount</th>
-    <th class='th'>Description</th>
+    <th class=''>Date</th>
+    <th class=''>Type</th>
+    <th class=''>Amount</th>
+    <th class=''>Description</th>
     </tr>
     <tbody id='expenses-tbody'>
     
@@ -349,7 +363,7 @@ async function renderExpenses () {
         <td>${row.description}</td>
         <td>${row.date}</td>
         <td>
-        <button class='button'>❌</button>
+        <button class=''>❌</button>
         </td>
         `
         tbody.appendChild(tr);
@@ -363,9 +377,9 @@ async function renderSettings () {
     const main = document.getElementById('main')
 
     main.innerHTML = `
-        <section class='section is-flex'>
+        <section class=''>
         <h2>Business Name</h2>
-        <input class='input'></input>
+        <input class=''></input>
         </section>
     `
 }
