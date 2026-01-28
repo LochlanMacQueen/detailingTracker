@@ -125,9 +125,9 @@ main.innerHTML = `
     </div>
     </div>
 
-    <div id='overview-bottom-card' class='' style='height: 350px;'>
-    <H2>Performance Graph</h2>
-    <p>Month Graph analyzing profit week to week</p>
+    <div id='overview-bottom-card' class='card shadow-sm border-0 mb-4' style='height: 350px;'>
+    <h4 class='card-title fw-bold'>Performance Graph</h4>
+    <p class='text-muted'>Month Graph analyzing profit week to week</p>
     </div>
 `
 }
@@ -169,7 +169,7 @@ const { data, error } = await supabase
     </div>
     <button id='add-job-btn' class=''>Add Job</button>
     `
-    document.getElementById('add-job-btn').onclick = getJobForm;
+    document.getElementById('add-job-btn').onclick = setAttr;
     // Row creation
     const tbody = document.getElementById('jobs-tbody');
 
@@ -185,74 +185,81 @@ const { data, error } = await supabase
         <td>${row.start_time}</td>
         <td>${row.status}</td>
         <td>
-        <button class=''>✖</button>
-        <button class=''>✓</button>
+        <button class='btn'>✖</button>
+        <button class='btn'>✓</button>
         </td>
         `;
         tbody.appendChild(tr);
     });
 }
 //Job Modal Functions
-async function closeModal () {
-    document.getElementById('modal').classList.add('hidden');
+
+async function setAttr() {
+    const modal_content = document.getElementById('modal-content');
+    const addBtn = document.getElementById('add-job-btn')
+    // inside modal need inputs to get all of job info. then need to call addjob function onclick of save button.
+    modal_content.innerHTML = `
+    <div class='d-flex justify-content-between mt-2' id='modal-header'>
+        <div>
+            <h5 class='title fw-bold mb-1'>Add New Job</h5>
+            <p class='text-muted small mb-0'>Fill in job details below</p>
+        </div>
+        <button class='btn btn-close'></button>
+    </div>
+    <div id='header-seperation' class='border'></div>
+    <div class='modal-body p-4'>
+        <div class='mb-3' id='client_info'>
+            <label class='form-label'>Client Name</label>
+            <input type='text' class='form-control' id='name' placeholder='Enter Client Name'></input>
+        </div>
+        <div class='mb-3'>
+        <label class='form-label'>Phone</label>
+        <input type='tel' class='form-control' id='phone' placeholder='(828) 123-4567' />
+        </div>
+        <div class='mb-3'>
+            <label class='form-label'>Address</label>
+            <input type='text' class='form-control' id='address' placeholder='123 Main St. Asheville' />
+        </div>
+        <div class='mb-3'>
+            <label class='form-label'>Price</label>
+            <input type='num' class='form-control' id='price' placeholder='$123' />
+        </div>
+        <div class='mb-3'>
+            <label class='form-label' id='services'>Services</services>
+            <select class='form-select' id='services'>
+                <option value=''>Select an option...</option>
+                <option value='full'>Full Detail</option>
+                <option value='interior'>Interior Detail</option>
+                <option value='exterior'>Exterior Detail</option>
+                <option value='other'>Other</option>
+            </select>
+        </div>
+        <div class='mb-3'>
+            <label class='form-label'>Start & End Time</label>
+            <div class='d-flex align-items-center gap-3'>
+                <input type='time' id='start-time' class='form-control' style='flex: 1;'>
+                <span class='text-muted'>to</span>
+                <input type='time' id='end-time' class='form-control' style='flex: 1;'>
+            </div>
+        </div>
+        <div class='mb-3'>
+            <label class='form-label'>Notes</label>
+            <textarea class='form-control' rows='3' placeholder='Add any additional notes or special instructions...' id='notes'></textarea>
+        </div>
+        <button class='btn btn-primary' id='saveJob'>Save</button>
+    </div>
+    `
+    document.getElementById('saveJob').onclick = addJob;  
+    
+    addBtn.setAttribute('data-bs-toggle', 'modal')
+    addBtn.setAttribute('data-bs-target', '#modal')
 }
 
-
-
-function getJobForm() {
-    const modal = document.getElementById('modal');
-    const Content = document.getElementById('modal-content');
-   
-
-
-// MODAL CODE V
-modal.addEventListener("click", (e) => {
-    if (e.target === modal) closeModal();
-  });
-
-modal.classList.remove('hidden');
-Content.innerHTML = `
-<h2>Job Create</h2>
-<br />
-<p>Customer Name</p>
-<input id='clientName' placeholder='John Doe'></input>
-<br />
-<p>Address</p>
-<input id='clientAddress' placeholder='1 peach street'></input>
-<br />
-<p>Price</p>
-<input id='price' placeholder='100'></input>
-<br />
-<p>Phone</p>
-<input id='phone' placeholder='8283921404'></input>
-<br />
-<p>Date</p>
-<input id='date' type='date' placeholder='11/08/2007'></input>
-<br />
-<p>Services</p>
-<input id='services' placeholder='Enter Services'></input>
-<br />
-<p>Start Time</p>
-<input id='start-time' type='time'></input>
-<br />
-<p>End Time</p>
-<input id='end-time' type='time'></input>
-<br />
-<p>Notes</p>
-<input id='notes' type='text' placeholder='Enter Notes'></input>
-<br />
-<button id='submit-job'>Save</button>
-<button id="close-modal-btn">Close</button>
-`
-document.getElementById('submit-job').onclick = addJob; 
-const close = document.getElementById('close-modal-btn');
-close.onclick = closeModal;
-
-}
+// Function needs repairs v
 async function addJob() {
         
-        const name = document.getElementById('clientName').value;
-        const address = document.getElementById('clientAddress').value;
+        const name = document.getElementById('name').value;
+        const address = document.getElementById('address').value;
         const price = Number(document.getElementById('price').value);
         const phone = document.getElementById('phone').value
         const date = document.getElementById('date').value;
