@@ -146,7 +146,7 @@ const { data, error } = await supabase
       // I need to make arrow buttons to go between pages. Need delete button and complete button.
       // Add pagnation when needed
       
-  
+    loadJobs();
     main.innerHTML = `
     <header>
     <h2 class=''>Jobs</h2>
@@ -167,44 +167,32 @@ const { data, error } = await supabase
     <tbody id="jobs-tbody"></tbody>
     </table>
     </div>
-    <button id='add-job-btn' class=''>Add Job</button>
+    <button id='add-job-btn' data-bs-toggle='modal' data-bs-target='#modal' class=''>Add Job</button>
     `
-    document.getElementById('add-job-btn').onclick = setAttr;
-    // Row creation
-    const tbody = document.getElementById('jobs-tbody');
 
-    data.forEach(row => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-        <td>${row.client_name}</td>
-        <td>${row.services}</td>
-        <td>${row.date}</td>
-        <td>${row.phone}</td>
-        <td>${row.address}</td>
-        <td>${row.notes}</td>
-        <td>${row.start_time}</td>
-        <td>${row.status}</td>
-        <td>
-        <button class='btn'>✖</button>
-        <button class='btn'>✓</button>
-        </td>
-        `;
-        tbody.appendChild(tr);
-    });
+    document.getElementById('add-job-btn').addEventListener('click', populateJobModal)
+    // Row creation
+    
 }
 //Job Modal Functions
 
-async function setAttr() {
-    const modal_content = document.getElementById('modal-content');
-    const addBtn = document.getElementById('add-job-btn')
+async function closeModal() {
+
+    const modal = bootstrap.Modal.getInstance(document.getElementById('modal'));
+    modal.hide();
+
+}
+
+async function populateJobModal() {
     // inside modal need inputs to get all of job info. then need to call addjob function onclick of save button.
+    const modal_content = document.getElementById('modal-content');
     modal_content.innerHTML = `
     <div class='d-flex justify-content-between mt-2' id='modal-header'>
         <div>
             <h5 class='title fw-bold mb-1'>Add New Job</h5>
             <p class='text-muted small mb-0'>Fill in job details below</p>
         </div>
-        <button class='btn btn-close'></button>
+        <button class='btn btn-close' id='close-modal-btn'></button>
     </div>
     <div id='header-seperation' class='border'></div>
     <div class='modal-body p-4'>
@@ -225,14 +213,12 @@ async function setAttr() {
             <input type='num' class='form-control' id='price' placeholder='$123' />
         </div>
         <div class='mb-3'>
-            <label class='form-label' id='services'>Services</services>
-            <select class='form-select' id='services'>
-                <option value=''>Select an option...</option>
-                <option value='full'>Full Detail</option>
-                <option value='interior'>Interior Detail</option>
-                <option value='exterior'>Exterior Detail</option>
-                <option value='other'>Other</option>
-            </select>
+            <label class='form-label'>Date</label>
+            <input type='date' class='form-control' id='date' placeholder='--/--/----' />
+        </div>
+        <div class='mb-3'>
+            <label class='form-label'>Services</services>
+            <input id='services' type='text' class='form-control' placeholder='Enter Service(s)' />
         </div>
         <div class='mb-3'>
             <label class='form-label'>Start & End Time</label>
@@ -251,13 +237,10 @@ async function setAttr() {
     `
     document.getElementById('saveJob').onclick = addJob;  
     
-    addBtn.setAttribute('data-bs-toggle', 'modal')
-    addBtn.setAttribute('data-bs-target', '#modal')
 }
 
 // Function needs repairs v
 async function addJob() {
-        
         const name = document.getElementById('name').value;
         const address = document.getElementById('address').value;
         const price = Number(document.getElementById('price').value);
@@ -267,7 +250,6 @@ async function addJob() {
         const start = document.getElementById('start-time').value;
         const end = document.getElementById('end-time').value;
         const notes = document.getElementById('notes').value;
-
         const { error } = await supabase
         .from('jobs')
         .insert({ 
@@ -281,6 +263,7 @@ async function addJob() {
         end_time: end,
         notes: notes,
         date: date,
+        status: 'incomplete',
     
     });
 
@@ -296,28 +279,25 @@ async function loadJobs() {
     .from('jobs')
     .select()
 
-    const tBody = document.querySelector('#jobTable tbody');
-    tBody.innerHTML = "";
-    data.forEach(job => {
+    const tbody = document.getElementById('jobs-tbody');
+
+    data.forEach(row => {
         const tr = document.createElement('tr');
-
-        const nameTd = document.createElement('td');
-        nameTd.textContent = job.client_name;
-
-        const addressTd = document.createElement('td');
-        addressTd.textContent = job.address;
-
-        const priceTd = document.createElement('td');
-        priceTd.textContent = job.price;
-
-        const phoneTd = document.createElement('td');
-        phoneTd.textContent = job.phone;
-
-        tr.appendChild(nameTd);
-        tr.appendChild(addressTd);
-        tr.appendChild(priceTd);
-        tr.appendChild(phoneTd);
-        tBody.appendChild(tr);
+        tr.innerHTML = `
+        <td>${row.client_name}</td>
+        <td>${row.services}</td>
+        <td>${row.date}</td>
+        <td>${row.phone}</td>
+        <td>${row.address}</td>
+        <td>${row.notes}</td>
+        <td>${row.start_time}</td>
+        <td>${row.status}</td>
+        <td>
+        <button class='btn'>✖</button>
+        <button class='btn'>✓</button>
+        </td>
+        `;
+        tbody.appendChild(tr);
     });
     
 }
@@ -339,30 +319,97 @@ async function renderCalendar () {
 }
 // Data Fetch
 async function renderExpenses () {
-      const { data, error } = await supabase
-        .from('expenses')
-        .select('date, category, amount, description')
-        .range(0,24)
+
     const main = document.getElementById('main')
     main.innerHTML = `
     <h1 class=''>Expenses</h1>
     <div id='expenses-table-wrapper'>
-    <table class=''>
-    <tr>
-    <th class=''>Date</th>
-    <th class=''>Type</th>
-    <th class=''>Amount</th>
-    <th class=''>Description</th>
-    </tr>
-    <tbody id='expenses-tbody'>
+        <table class=''>
+            <tr>
+            <th class=''>Date</th>
+            <th class=''>Type</th>
+            <th class=''>Amount</th>
+            <th class=''>Description</th>
+            </tr>
+            <tbody id='expenses-tbody'>
     
-    </tbody>
-    </table>
+            </tbody>
+        </table>
     </div>
-
+    <button class='btn btn-primary rounded' data-bs-toggle='modal' data-bs-target='#modal' id='add-expense-btn'>Add Expense</button>
     `
+    loadExpenses();
+    document.getElementById('add-expense-btn').addEventListener('click', populateExpenseModal)
+    
+    // Add expense summary for each month
+}
+
+async function populateExpenseModal() {
+    const modal_content = document.getElementById('modal-content');
+    modal_content.innerHTML = `
+        <div id='expense-header' class='mb-4'>
+            <h5 class='title fw-bold'>Add Expense</h5>
+            <button class='btn btn-close' id='close-expense-modal-btn'></button>
+        </div>
+        <div class='border' id='head-seperation'></div>
+        <div class='modal-body p-4'>
+            <div class='mb-3'>
+                <label class='form-label'>Date</label>
+                <input type='date' class='form-control' id='exp-date' placeholder=''></input>
+            </div>
+            <div class='mb-3'>
+                <label class='form-label'>Category</label>
+                <input type='' class='form-control' id='exp-category' placeholder=''></input>
+            </div>
+            <div class='mb-3'>
+                <label class='form-label'>Amount</label>
+                <input type='' class='form-control' id='exp-amount' placeholder=''></input>
+            </div>
+            <div class='mb-3'>
+                <label class='form-label'>Description</label>
+                <textarea id='exp-description' class='form-control' rows='3' placeholder='Add a description for the expense'></textarea>
+            </div>
+            <button class='btn btn-primary' id='saveExpense'>Save</button>
+        </div>
+    
+    `
+    document.getElementById('saveExpense').onclick = addExpense;
+    loadExpenses();
+}
+
+// ----------------- Add Expense Function  -------------------
+async function addExpense() {
+    const date = document.getElementById('exp-date').value;
+    const category = document.getElementById('exp-category').value;
+    const amount = document.getElementById('exp.amount').value;
+    const description = document.getElementById('exp-description').value;
+
+    // Get data and insert constants
+    const { error } = await supabase
+        .from('expenses')
+        .insert({ 
+        date: date,
+        category: category,
+        amount: amount,
+        description: description,
+    });
+
+    if (error) {
+        console.error(error);
+        return;
+    }
+    loadExpenses();
+}
+// ----------------- Load Expense Function -------------------
+async function loadExpenses() {
+    const { data, error } = await supabase
+        .from('expenses')
+        .select('date, category, amount, description')
+        .range(0,24)
+        
     const tbody = document.getElementById('expenses-tbody');
     const tr = document.createElement('tr');
+    tbody.innerHTML = "";
     data.forEach(row => {
         tr.innerHTML =  `
         <td>${row.category}</td>
@@ -372,21 +419,18 @@ async function renderExpenses () {
         <td>
         <button class=''>❌</button>
         </td>
-        `
-        tbody.appendChild(tr);
-    });
-    // Add expense summary for each month
+            `
+            tbody.appendChild(tr);
+        });
 }
-// ----------------- Add Expense Function  -------------------
-// ----------------- Load Expense Function -------------------
 
 async function renderSettings () {
     const main = document.getElementById('main')
 
     main.innerHTML = `
         <section class=''>
-        <h2>Business Name</h2>
-        <input class=''></input>
+            <h2>Business Name</h2>
+            <input class=''></input>
         </section>
     `
 }
