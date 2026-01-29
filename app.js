@@ -52,30 +52,30 @@ async function renderLoggedIn(user) {
     app.innerHTML = `
 
     <div class='row'>
-    <aside id='sidebar' class="d-flex flex-column justify-content-between position-sticky top-0 col-2 bg-dark text-white vh-100">
+    <aside id='sidebar' class="d-flex flex-column justify-content-between position-sticky top-0 col-2 sidebar border-end vh-100">
     <div>
     <div class='py-3'>
-    <div class='border-bottom border-secondary'>
-    <h5 class='fw-bold mb-2'>Biltmore Forest Detailing</h5>
+    <div class='sidebar-border border-bottom'>
+    <h5 class='sidebar-brand fw-bold mb-2'>Biltmore Forest Detailing</h5>
     </div>
-    <nav class='pt-4'>
-    <div id='overview' class='nav-link text-white px-3 py-2 rounded mb-1 fs-5'>Overview</div>
-    <div id='jobs' class='nav-link text-white px-3 py-2 rounded mb-1 fs-5''>Jobs</div>
-    <div id='calendar' class='nav-link text-white px-3 py-2 rounded mb-1 fs-5''>Calendar</div>
-    <div id='expenses' class='nav-link text-white px-3 py-2 rounded mb-1 fs-5''>Expenses</div>
-    <div id='settings' class='nav-link text-white px-3 py-2 rounded mb-1 fs-5''>Settings</div>
+    <nav class='pt-4 sidebar-menu'>
+    <div id='overview' class='sidebar-link  px-3 py-2 rounded mb-1 fs-6'>Overview</div>
+    <div id='jobs' class='sidebar-link  px-3 py-2 rounded mb-1 fs-6''>Jobs</div>
+    <div id='calendar' class='sidebar-link  px-3 py-2 rounded mb-1 fs-6''>Calendar</div>
+    <div id='expenses' class='sidebar-link  px-3 py-2 rounded mb-1 fs-6''>Expenses</div>
+    <div id='settings' class='sidebar-link  px-3 py-2 rounded mb-1 fs-6''>Settings</div>
     </nav>
     </div>
     </div>
     
     <div class=' d-flex align-items-center border-top border-secondary'>
     <div class=' d-flex align-items-center justify-content-center rounded-circle bg-primary' style='width: 36px; height: 36px;'>
-    <span class='text-white fw-bold'>LM</span>
+    <span class=' fw-bold'>LM</span>
     </div>
     <p class='mt-auto mb-auto fw-medium small fs-6'>Lochlan MacQueen</p>
     </div>
     </aside>
-    <main id='main' class='col p-4'>
+    <main id='main' class='main-content col p-4'>
 
 
     </main>
@@ -92,26 +92,27 @@ async function renderLoggedIn(user) {
 // ------------- RENDER NAV SECTIONS --------------
 async function renderOverview () {
 const main = document.getElementById('main')
+document.getElementById('overview').classList.add('active')
 
 main.innerHTML = `
-    <div id='overview-top-card' class='row pb-4 g-4'>
+    <div id='overview-top-card' class=' card d-flex flex-row justify-content-evenly mb-4'>
 
-    <div class ='col-4 card border-0' stlye='height: 140px;'>
-    <div class='card-body shadow-sm rounded p-3 d-flex justify-content-center align-items-center flex-column'>
+    <div class ='py-3' stlye='height: 140px;'>
+    <div class='stat-card card shadow-sm rounded p-3 d-flex justify-content-center align-items-center flex-column'>
     <h2 class='fw-bold mb-1'>$902</h2>
     <p class='text-muted text-uppercase small mb-0'>Revenue this month</p>
     </div>
     </div>
 
-    <div class ='col-4 card border-0'>
-    <div class='card-body shadow-sm rounded p-3 d-flex justify-content-center align-items-center flex-column'>
+    <div class ='py-3'>
+    <div class='stat-card card shadow-sm rounded p-3 d-flex justify-content-center align-items-center flex-column'>
     <h2 class='fw-bold'>$404</h2>
     <p class='text-muted text-muted text-uppercase small mb-0'>Profit this month</p>
     </div>
     </div>
 
-    <div class = 'col-4 card border-0'>
-    <div class='card-body shadow-sm rounded p-3 d-flex justify-content-center align-items-center flex-column'>
+    <div class = 'py-3'>
+    <div class='stat-card card shadow-sm rounded p-3 d-flex justify-content-center align-items-center flex-column'>
     <h2 class='fw-bold'>12</h2>
     <p class='text-muted text-muted text-uppercase small mb-0'>Jobs this week</p>
     </div>
@@ -142,6 +143,7 @@ const { data, error } = await supabase
   
   async function renderJobs () {
       const main = document.getElementById('main')
+      document.getElementById('jobs').classList.add('active')
       // I need to put the column titles from database into the header row. Then I need to make it display rows that it has, up to 25 of them.
       // I need to make arrow buttons to go between pages. Need delete button and complete button.
       // Add pagnation when needed
@@ -152,7 +154,7 @@ const { data, error } = await supabase
     <h2 class=''>Jobs</h2>
     </header>
     <div id='jobs-table-card'>
-    <table class=''>
+    <table class='table table-hover table-responsive-sm'>
     <tr class=''>
     <th class=''>Client Name</th>
     <th>Service</th>
@@ -167,7 +169,7 @@ const { data, error } = await supabase
     <tbody id="jobs-tbody"></tbody>
     </table>
     </div>
-    <button id='add-job-btn' data-bs-toggle='modal' data-bs-target='#modal' class=''>Add Job</button>
+    <button id='add-job-btn' data-bs-toggle='modal' data-bs-target='#modal' class='btn btn-primary'>Add Job</button>
     `
 
     document.getElementById('add-job-btn').addEventListener('click', populateJobModal)
@@ -303,6 +305,7 @@ async function loadJobs() {
 }
 async function renderCalendar () {
     const main = document.getElementById('main')
+    document.getElementById('calendar').classList.add('active')
 
     main.innerHTML = `
     <h2>Calendar</h2>
@@ -324,7 +327,7 @@ async function renderExpenses () {
     main.innerHTML = `
     <h1 class=''>Expenses</h1>
     <div id='expenses-table-wrapper'>
-        <table class=''>
+        <table class='table table-hover'>
             <tr>
             <th class=''>Date</th>
             <th class=''>Type</th>
@@ -402,6 +405,7 @@ async function addExpense() {
 }
 // ----------------- Load Expense Function -------------------
 async function loadExpenses() {
+    document.getElementById('expenses').classList.add('active')
     const { data, error } = await supabase
         .from('expenses')
         .select('date, category, amount, description')
@@ -426,6 +430,7 @@ async function loadExpenses() {
 
 async function renderSettings () {
     const main = document.getElementById('main')
+    document.getElementById('settings').classList.add('active')
 
     main.innerHTML = `
         <section class=''>
