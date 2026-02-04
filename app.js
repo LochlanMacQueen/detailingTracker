@@ -1,5 +1,4 @@
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
-
 const SUPABASE_URL = "https://xhwndgksrcfwdnveuudm.supabase.co";
 const SUPABASE_ANON_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhod25kZ2tzcmNmd2RudmV1dWRtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg3MDA3NjgsImV4cCI6MjA4NDI3Njc2OH0.U_xhdc4j8jQQK2D9L0qB45IrofBTBbnpTpA7AJjaxdw";
@@ -147,9 +146,12 @@ async function renderOverview() {
     link.classList.remove('active');
   })
   document.getElementById("overview").classList.add("active");
-
+  // Quick Actions card
+  // Mini charts in some places
+  // maybe a goal creation feature would fit
+  // Feature could have a set goal for revenue, and a progress bar for reaching it.
   main.innerHTML = `
-    <div id='overview-top-card' class=' card d-flex flex-row mb-4 justify-content-between'>
+    <div id='overview-top-card' class=' card d-flex flex-row mb-2 justify-content-between'>
 
     <div class ='py-3 mx-1 flex-fill'>
     <div class='stat-card card shadow-sm rounded p-3 d-flex justify-content-center align-items-center flex-column'>
@@ -173,24 +175,127 @@ async function renderOverview() {
     </div>
 
     </div>
-    <div id='overview-middle-card' class='card shadow-sm border-0 mb-4'>
-      <div class='card-body p-4'>
+    <div id='overview-middle-card' class='row card shadow-sm border-0 mb-2'>
+      <div class='card-body p-4 col-8'>
         <h4 class='card-title fw-bold'>Upcoming Job</h4>
         <div id='card-holder' class='d-flex justify-content-evenly'>
-    
         </div>
-      </div>
+        </div>
+          <div id='sm-chart-holder' class='card col-4' style='width: 250px;'>
+            <canvas id='small-chart'></div>
+          </div>
     </div>
 
-    <div id='overview-bottom-card' class='chart-card shadow-sm border-0 mb-4'>
+    <div id='overview-bottom-card' class='chart-card shadow-sm border-0 mb-2'>
       <div class='chart-header'>
         <h3 class='chart-title'>Revenue Chart</h3>
         <p class='chart-subtitle'>Monthly Trends</p>
       </div>
-
+      <canvas id='big-chart'>
+      
+      </canvas>
       </div>
     </div>
 `;
+
+  const smCtx = document.getElementById('small-chart').getContext('2d');
+  const mid_chart = new Chart(smCtx, {
+    type: 'doughnut',
+    data: {
+      datasets: [{
+        data: [12,4,5],
+        backgroundColor: [],
+        borderWidth: 2,
+        borderColor: '#fff'
+      }]
+    },
+    options: {
+      radius: 100,
+      responsive: true,
+      maintainAspectRatio: true,
+      aspectRatio: 1,
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: {
+            font: {
+              family: 'DM Sans',
+              size: 11,
+            },
+            padding: 10,
+            boxWidth: 12
+          }
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              return context.label + ': ' + context.parsed + ' jobs';
+            }
+          }
+        }
+      }
+    }
+
+  })
+
+  const ctx = document.getElementById('big-chart').getContext('2d');
+  const bot_chart  = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: ['week 1', 'week 2', 'week 3', 'week 4'],
+      datasets: [{
+        label: 'Weekly Revenue',
+        data: [2900,2200,2700,2400],
+        backgroundColor: 'rgba(84,159,242,0.2)',
+        borderColor: '#5e9ff2',
+        borderWidth: 2,
+        borderRadius: 8,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      aspectRatio: 3,
+      plugins: {
+        legend: {
+          display: false,
+        },
+        tooltip: {
+          backgroundColor: '#fff',
+          titleColor: "#000",
+          bodyColor: '#666',
+          borderColor: '#ddd',
+          borderWidth: 1,
+          padding: 12,
+          callbacks: {
+            label: function(context) {
+              return '$' + context.parsed.y;
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: {
+            display: false,
+          },
+          ticks: {
+            font: {
+              size: 12
+            },
+            color: '#8b96a5'
+          }
+        },
+        y: {
+          beginAtZero: true,
+          grid: {
+            color: '#f5f7f9'
+          },
+          color: '#8b96a5'
+        }
+      }
+    },
+  })
   await upcomingJob();
 }
 // KPI Functions
@@ -235,7 +340,7 @@ async function upcomingJob() {
   .select('client_name, date, address, price, start_time, services')
   .gte('date', today)
   .order('date', { ascending: true })
-  .limit(3)
+  .limit(2)
 
   if (error) {
     console.log(error);
