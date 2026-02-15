@@ -122,7 +122,7 @@ async function renderLoggedIn(user) {
     </main>
     </div>
     `;
-    renderExpenses();
+    renderOverview();
     document.getElementById('overview').onclick = renderOverview;
     document.getElementById('jobs').onclick = renderJobs;
     document.getElementById('expenses').onclick = renderExpenses;
@@ -130,10 +130,275 @@ async function renderLoggedIn(user) {
 
 // ------ Section Renders -------
 async function renderOverview() {
+  const main = document.getElementById('main')
+  const revenue = await getRevenue();
+  const profit = await getProfit();
+  const jobs = await getJobs();
 
+  main.innerHTML = `
+  <header>Overview</header>
 
+  <div id='top-third' class='row mb-3'>
+    <div id='revenue-KPI' class='col-4'>
+      <div class='card p-4'>
+        <h1>$${revenue}</h1>
+        <p class='text-muted'>ALL TIME REVENUE</p>
+      </div>
+    </div>
+
+    <div id='profit-KPI' class='col-4'>
+      <div class='card p-4'>
+        <h1>$${profit}</h1>
+        <p class='text-muted'>ALL TIME PROFIT</p>
+      </div>
+    </div>
+
+    <div id='jobs-KPI' class='col-4'>
+      <div class='card p-4'>
+        <h1>${jobs}</h1>
+        <p class='text-muted'>ALL TIME JOBS</p>
+      </div>
+    </div>
+
+  </div>
+  <div id='middle-third' class='row mb-3'>
+    <div id='upcoming-card' class='col-8'>
+      <div class='card p-4'>
+        <h2>Upcoming Jobs</h2>
+        <div id='upcoming-jobs-container'></div>
+      </div>
+    </div>
+    <div id='sm-chart' class='col-4'>
+      <div class='card p-4'>
+        <h2>Chart</h2>
+        <canvas id='statusChart'></canvas>
+      </div>
+    </div>
+  </div>
+  <div id='bottom-third' class='row'>
+    <canvas id='revenueChart' class='col-12'></canvas>
+  </div>
+  `
+  // call populating helpers
+  loadUpcomingJobs();
+  createStatusChart();
+  createRevenueChart();
 
 }
+//overview helpers
+async function loadUpcomingJobs(){
+  const today = new Date().toISOString().slice(0,10);
+  
+  const {data, error} = await supabase
+  .from('jobs')
+  .select('*')
+  .gte('date', today)
+  .order('date', {ascending: true})
+  .limit(2);
+
+  if(error){
+    console.log(error)
+    return;
+  }
+  const container = document.getElementById('upcoming-jobs-container')
+  if(data.length === 0){
+    container.innerHTML = `
+      <p class='text-muted'>No upcoming jobs.</p>
+    `
+  } else {
+    container.innerHTML = `
+    
+    `
+    data.forEach(job => {
+      const jobCard = document.createElement('div');
+      jobCard.className = 'mb-3 p-3 border-start border-primary border-4 bg-light rounded';
+      jobCard.innerHTML = `
+        <div class= 'd-flex justify-content-between align-items-start'>
+          <h5 class='fw-bold mb-1'>${job.client_name}</h5>
+          <p>
+            <i class='bi bi-calendar'></i> ${job.date} * ${job.start_time}
+          </p>
+          <p>${job.services}</p>
+          <p>
+            <i class='bi bi-geo-alt'></i> ${job.address}
+          </p>
+        </div>
+        <div>
+          <span class='badge bg-primary fs-6'>$${job.price}</span>
+        </div>
+      `
+      container.appendChild(jobCard);
+    })
+  }
+}
+async function createStatusChart(){
+
+  const {data, error} = await supabase
+  .from('jobs')
+  .select('status')
+
+  if(error){
+    console.log(error)
+    return;
+  }
+
+  //status counts
+  let complete = 0;
+  let incomplete = 0;
+
+  data.forEach(job => {
+    if(job.status === "complete"){
+      complete ++;
+    } else if(job.status === 'incomplete'){
+      incomplete ++;
+    }
+  })
+  
+  // chart creation
+  let ctx = document.getElementById('statusChart').getContext('2d');
+  const chart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['complete', 'pending'],
+      datasets: [{
+        data: [complete, incomplete],
+        backgroundColor: [
+          '#34d399',
+          '#fbbf24'
+        ],
+        borderWidth: 2,
+        borderColor: '#fff'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: {
+            font: {
+              family: 'DM Sans',
+              size: 11
+            },
+            padding: 10,
+            boxWidth: 12
+          }
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              const total = complete + incomplete;
+              const percentage = ((context.parsed / total) * 100).toFixed(0);
+              return context.label + ': ' + context.parsed + ' (' + percentage + '%)';
+            }
+          }
+        }
+      },
+      cutout: '65%'
+    }
+  })
+
+}
+async function createRevenueChart(){
+  const weeklyData = await getWeeklyRevenue();
+
+  const ctx = document.getElementById('revenueChart').getContext('2d');
+  const chart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+      datasets: [{
+        label: 'Revenue',
+        data: weeklyData,
+        backgroundColor: 'rgba(94, 159, 242, 0.2)',
+        borderColor: '#5e9ff2',
+        borderWidth: 2,
+        borderRadius: 8
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              return '$' + context.parsed.y;
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: {
+            display: false
+          }
+        },
+        y: {
+          beginAtZero: true,
+          ticks: {
+            callback: function(value) {
+              return '$' + value;
+            }
+          }
+        }
+      }
+    }
+  });
+}
+async function getWeeklyRevenue(){
+  return [850, 1200, 1100, 1250];
+}
+async function getRevenue() {
+ const {data, error} = await supabase
+ .from('jobs')
+ .select('price')
+
+ if(error) {
+  console.log(error)
+  return 0;
+}
+let count = 0;
+data.forEach(job => {
+  count += Number(job.price);
+})
+return count;
+}
+
+async function getProfit(){
+  const revenue = await getRevenue();
+  const {data, error} = await supabase
+  .from('expenses')
+  .select('amount')
+
+  if(error){
+    console.log(error)
+    return 0;
+  }
+  let count = 0;
+  data.forEach(expense => {
+    count += Number(expense.amount);
+  })
+
+  return revenue - count;
+}
+
+async function getJobs(){
+  const {data, error} = await supabase
+  .from('jobs')
+  .select('id')
+
+  if(error){
+    console.log(error)
+    return 0;
+  }
+  return data.length;
+}
+
 async function renderJobs() {
   const main = document.getElementById('main')
   main.innerHTML = `
@@ -171,6 +436,7 @@ async function renderExpenses() {
       <td>Category</td>
       <td>Amount</td>
       <td>Date</td>
+      <td>Description</td>
     </tr></th>
     <tbody id='expenses-tbody'>
     
@@ -192,10 +458,12 @@ async function loadJobs() {
   const td = document.createElement('td');
   const {data, error} = await supabase
   .from('jobs')
-  .select("client_name, phone, date, services, address, start_time, status")
+  .select("*")
   .order('date', {ascending: false});
-  console.log(data)
   
+  //Tbody clear
+  tbody.innerHTML = ``;
+
   // table insert
   data.forEach(job => {
     const tr = document.createElement('tr');
@@ -207,13 +475,24 @@ async function loadJobs() {
     <td>${job.date}</td>
     <td>${job.start_time}</td>
     <td>${job.status}</td>
-    <button>✅</button>
-    <button>❌</button>
+    <button class='complete-btn' data-id='${job.id}'>✅</button>
+    <button class='delete-btn' data-id='${job.id}'>❌</button>
     `;
     tbody.appendChild(tr)
   })
   
-
+  document.querySelectorAll('.complete-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const jobId = btn.getAttribute('data-id');
+      completeJob(jobId);
+    })
+  })
+  document.querySelectorAll('.delete-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const jobId = btn.getAttribute('data-id');
+      deleteJob(jobId);
+    })
+  })
 
 
   if(error) {
@@ -224,8 +503,11 @@ async function loadExpenses() {
   const tbody = document.getElementById('expenses-tbody');
   const {data, error} = await supabase
   .from('expenses')
-  .select('date, category, amount, description')
+  .select('*')
   .order('date', {ascending: false});
+
+  //tbody clear
+  tbody.innerHTML = ``;
 
   data.forEach(expense => {
     const tr = document.createElement('tr');
@@ -233,9 +515,19 @@ async function loadExpenses() {
     <td>${expense.category}</td>
     <td>${expense.amount}</td>
     <td>${expense.date}</td>
-    <button>❌</button>
+    <td>${expense.description}</td>
+    <button class='delete-expense-btn' data-id='${expense.id}'>❌</button>
     `
     tbody.appendChild(tr);
+
+    
+  })
+
+  document.querySelectorAll('.delete-expense-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const expenseId = btn.getAttribute('data-id');
+      deleteExpense(expenseId);
+    })
   })
 
   if(error) {
@@ -249,7 +541,7 @@ async function addJob() {
   const services = document.getElementById('services').value;
   const start = document.getElementById('start-time').value;
   const date = document.getElementById('job-date').value;
-  const status = document.getElementById('job-status').value;
+  const status = 'incomplete';
   const phone = document.getElementById('phone').value;
   const notes = document.getElementById('notes').value;
 
@@ -347,10 +639,6 @@ async function addJobModal() {
       <label class='form-control'>Date</label>
       <input id='job-date' type='date' />
     </div>
-    <div id='status-wrapper'>
-      <label class='form-control'>status</label>
-      <input id='job-status' type='text' placeholder='incomplete' />
-    </div>
     <div id='notes-wrapper'>
       <label class='form-control'>Notes (optional)</label>
       <textarea id='notes' placeholder='give a description'></textarea>
@@ -388,10 +676,38 @@ async function addExpenseModal() {
   `
   document.getElementById('add-expense-btn').onclick = addExpense;
 }
+// ------ complete and delete
+async function completeJob(jobId){
+  const {error} = await supabase
+  .from('jobs')
+  .update({ status: 'complete' })
+  .eq('id', jobId);
 
+  loadJobs();
+}
+async function deleteJob(jobId){
+  const {error} = await supabase
+  .from('jobs')
+  .delete()
+  .eq('id', jobId);
 
-// Data Fetch
+  if(error){
+    console.log(error);
+  }
+  loadJobs();
+}
+async function deleteExpense(expenseId){
+  const {error} = await supabase
+  .from('expenses')
+  .delete()
+  .eq('id', expenseId)
 
+  if(error){
+    console.log(error);
+  }
+
+  loadExpenses();
+}
 
 // ------------ Auth Functions ------------------------
 async function signUp() {
