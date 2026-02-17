@@ -357,6 +357,7 @@ async function getRevenue() {
  const {data, error} = await supabase
  .from('jobs')
  .select('price')
+ .eq('status', 'complete')
 
  if(error) {
   console.log(error)
