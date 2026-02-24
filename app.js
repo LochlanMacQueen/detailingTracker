@@ -1,6 +1,7 @@
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
-import { SUPABASE_URL, SUPABASE_ANON_KEY } from './config.js';
 
+const SUPABASE_URL ="https://xhwndgksrcfwdnveuudm.supabase.co"
+const SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhod25kZ2tzcmNmd2RudmV1dWRtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg3MDA3NjgsImV4cCI6MjA4NDI3Njc2OH0.U_xhdc4j8jQQK2D9L0qB45IrofBTBbnpTpA7AJjaxdw"
 // Create a single supabase client for interacting with your database
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -404,15 +405,16 @@ async function renderJobs() {
   const main = document.getElementById('main')
   main.innerHTML = `
   <h5>Jobs go here</h5>
-  <table class='table'>
+  <table class='table table-hover align-middle table-responsive'>
     <th><tr>
-      <td>Name</td>
-      <td>address</td>
-      <td>services</td>
-      <td>Phone</td>
-      <td>date</td>
-      <td>time</td>
-      <td>status</td>
+      <td class='fw-bold'>Name</td>
+      <td class='fw-bold'>address</td>
+      <td class='fw-bold'>services</td>
+      <td class='fw-bold'>Phone</td>
+      <td class='fw-bold'>date</td>
+      <td class='fw-bold'>time</td>
+      <td class='fw-bold'>Price</td>
+      <td class='fw-bold'>status</td>
     </tr></th>
     <tbody id='jobs-tbody'>
 
@@ -464,17 +466,19 @@ async function loadJobs() {
   
   //Tbody clear
   tbody.innerHTML = ``;
-
   // table insert
   data.forEach(job => {
-    const tr = document.createElement('tr');
+      // Time formatting 
+      const time = formatTime(job.start_time);
+      const tr = document.createElement('tr');
     tr.innerHTML = `
-    <td>${job.client_name}</td>
+    <td class='fw-bold'>${job.client_name}</td>
     <td>${job.address}</td>
     <td>${job.services}</td>
     <td>${job.phone}</td>
     <td>${job.date}</td>
-    <td>${job.start_time}</td>
+    <td>${time}</td>
+    <td class='fw-bold'>$${job.price}</td>
     <td>${job.status}</td>
     <button class='complete-btn' data-id='${job.id}'>✅</button>
     <button class='delete-btn' data-id='${job.id}'>❌</button>
@@ -676,6 +680,26 @@ async function addExpenseModal() {
   <button id='add-expense-btn' class='btn btn-primary'>Submit</button>
   `
   document.getElementById('add-expense-btn').onclick = addExpense;
+}
+// Formatting Functions 
+function formatTime(time) {
+    const sliced = time.slice(0, 5);
+    const halves = sliced.split(':');
+    let hours = Number(halves[0]);
+    const minutes = halves[1];
+    let end = 'AM';
+    
+    if (hours >= 12) {
+        end = 'PM';
+    }
+    
+    if (hours > 12) {
+        hours = hours - 12;
+    } else if (hours === 0) {
+        hours = 12;
+    }
+    
+    return `${hours}:${minutes} ${end}`;
 }
 // ------ complete and delete
 async function completeJob(jobId){
