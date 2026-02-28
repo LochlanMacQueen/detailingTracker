@@ -137,7 +137,7 @@ async function renderOverview() {
   const jobs = await getJobs();
 
   main.innerHTML = `
-  <header>Overview</header>
+  <header class='header'>Overview</header>
 
   <div id='top-third' class='row mb-3'>
     <div id='revenue-KPI' class='col-4'>
@@ -163,13 +163,13 @@ async function renderOverview() {
 
   </div>
   <div id='middle-third' class='row mb-3'>
-    <div id='upcoming-card' class='col-8'>
+    <div id='upcoming-card' class='col-8 h-100'>
       <div class='card p-4'>
         <h2>Upcoming Jobs</h2>
         <div id='upcoming-jobs-container'></div>
       </div>
     </div>
-    <div id='sm-chart' class='col-4'>
+    <div id='sm-chart' class='col-4 h-100'>
       <div class='card p-4'>
         <h2>Chart</h2>
         <canvas id='statusChart'></canvas>
@@ -470,6 +470,7 @@ async function loadJobs() {
   data.forEach(job => {
       // Time formatting 
       const time = formatTime(job.start_time);
+      const date = formatJobDate(job.date);
       const tr = document.createElement('tr');
     tr.innerHTML = `
     <td class='fw-bold'>${job.client_name}</td>
@@ -480,8 +481,14 @@ async function loadJobs() {
     <td>${time}</td>
     <td class='fw-bold'>$${job.price}</td>
     <td>${job.status}</td>
-    <button class='complete-btn' data-id='${job.id}'>✅</button>
-    <button class='delete-btn' data-id='${job.id}'>❌</button>
+    <div class='d-flex '>
+    <button class='complete-btn border-0' data-id='${job.id}'>
+        <h5 class='bi bi-check'></h5>
+    </button>
+    <button class='delete-btn border-0' data-id='${job.id}'>
+        <h5 class='bi bi-x-square-fill'></h5>
+    </button>
+    </div>
     `;
     tbody.appendChild(tr)
   })
@@ -701,6 +708,10 @@ function formatTime(time) {
     
     return `${hours}:${minutes} ${end}`;
 }
+function formatJobDate(date){
+    console.log(date)
+}
+formatJobDate('2026-03-04');
 // ------ complete and delete
 async function completeJob(jobId){
   const {error} = await supabase
